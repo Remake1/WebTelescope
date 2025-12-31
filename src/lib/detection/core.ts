@@ -7,7 +7,7 @@ import type { DetectionResult } from './types';
 
 /**
  * Detect React framework
- * Checks DevTools hook, DOM keys, and React root containers
+ * Checks DevTools hook, DOM keys, React root containers, and internal fiber
  */
 export function detectReact(): DetectionResult {
     const result: DetectionResult = {
@@ -16,8 +16,10 @@ export function detectReact(): DetectionResult {
         detected: false,
     };
 
+    const w = window as any;
+
     // Check DevTools hook (most reliable for version)
-    const hook = (window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    const hook = w.__REACT_DEVTOOLS_GLOBAL_HOOK__;
     if (hook?.renderers) {
         const renderers = [...hook.renderers.values()];
         if (renderers.length > 0) {
@@ -28,19 +30,35 @@ export function detectReact(): DetectionResult {
         }
     }
 
-    // Check for React in document keys
-    const hasReactKeys = Object.keys(document).some(key => key.includes('react'));
-    if (hasReactKeys) {
-        result.detected = true;
-        return result;
+    // Check for React internal fiber properties on DOM elements
+    const rootElement = document.getElementById('root') || document.getElementById('__next') || document.body.firstElementChild;
+    if (rootElement) {
+        const keys = Object.keys(rootElement);
+        const reactKey = keys.find(key =>
+            key.startsWith('__reactFiber$') ||
+            key.startsWith('__reactInternalInstance$') ||
+            key.startsWith('__reactContainer$')
+        );
+        if (reactKey) {
+            result.detected = true;
+            return result;
+        }
     }
 
     // Check for React root containers
-    const hasReactRoot = Array.from(document.body.querySelectorAll('*')).some(
-        (node: any) => node._reactRootContainer
-    );
-    if (hasReactRoot) {
-        result.detected = true;
+    const allElements = document.querySelectorAll('*');
+    for (const node of allElements) {
+        const nodeAny = node as any;
+        if (nodeAny._reactRootContainer) {
+            result.detected = true;
+            return result;
+        }
+        // Check for React 18+ root
+        const keys = Object.keys(node);
+        if (keys.some(k => k.startsWith('__reactFiber$') || k.startsWith('__reactContainer$'))) {
+            result.detected = true;
+            return result;
+        }
     }
 
     return result;
@@ -59,6 +77,12 @@ export function detectVue(): DetectionResult {
 
     const w = window as any;
 
+    // Check for Vue 3 global marker (most common for Vue 3)
+    if (w.__VUE__) {
+        result.detected = true;
+        // Try to get version from app instance
+    }
+
     // Check for Vue 2 global
     if (w.Vue?.version) {
         result.detected = true;
@@ -66,15 +90,17 @@ export function detectVue(): DetectionResult {
         return result;
     }
 
-    // Check for Vue 3 global marker
-    if (w.__VUE__) {
-        result.detected = true;
-    }
-
     // Scan DOM for Vue instances
     const allElements = document.querySelectorAll('*');
     for (const el of allElements) {
         const element = el as any;
+
+        // Vue 3 attaches to __vue_app__ on the app root
+        if (element.__vue_app__) {
+            result.detected = true;
+            result.version = element.__vue_app__.version;
+            return result;
+        }
 
         // Vue 2 attaches to __vue__
         if (element.__vue__) {
@@ -82,19 +108,23 @@ export function detectVue(): DetectionResult {
             result.version = element.__vue__.$options?._base?.version || '2.x';
             return result;
         }
-
-        // Vue 3 attaches to __vue_app__
-        if (element.__vue_app__) {
-            result.detected = true;
-            result.version = element.__vue_app__.version;
-            return result;
-        }
     }
 
-    // Check DevTools hook
-    if (!result.version && w.__VUE_DEVTOOLS_GLOBAL_HOOK__?.renderers?.length > 0) {
-        result.detected = true;
-        result.version = w.__VUE_DEVTOOLS_GLOBAL_HOOK__.renderers[0].version;
+    // Check DevTools hook for Vue
+    const vueHook = w.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+    if (vueHook) {
+        // Vue 3 apps array
+        if (vueHook.apps?.length > 0) {
+            result.detected = true;
+            result.version = vueHook.apps[0]?.version;
+            return result;
+        }
+        // Vue 2 renderers
+        if (vueHook.Vue?.version) {
+            result.detected = true;
+            result.version = vueHook.Vue.version;
+            return result;
+        }
     }
 
     return result;

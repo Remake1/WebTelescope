@@ -1,53 +1,77 @@
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
-import SectionHeader from '@/components/SectionHeader.vue';
 import InfoCard from '@/components/InfoCard.vue';
-import PluginBadge from '@/components/PluginBadge.vue';
+import { useDetection } from '@/composables/useDetection';
+import { computed } from 'vue';
+import type { DetectionResult } from '@/lib/detection';
+import ErrorIcon from "@/components/ErrorIcon.vue";
+import SearchIcon from "@/components/SearchIcon.vue";
+
+const { results, loading, error } = useDetection();
+
+interface DisplayTech extends DetectionResult {
+  category: string;
+}
+
+// Format version: cut off everything after '-'
+function formatVersion(version: string | undefined): string | undefined {
+  if (!version) return undefined;
+  const dashIndex = version.indexOf('-');
+  return dashIndex > 0 ? version.substring(0, dashIndex) : version;
+}
+
+// Combine all detected technologies with category labels
+const allDetected = computed<DisplayTech[]>(() => {
+  if (!results.value) return [];
+  return [
+    ...results.value.core.filter(r => r.detected).map(r => ({ ...r, category: 'Core' })),
+    ...results.value.meta.filter(r => r.detected).map(r => ({ ...r, category: 'Meta framework' })),
+    ...results.value.styles.filter(r => r.detected).map(r => ({ ...r, category: 'UI' })),
+  ];
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-white">
     <Header />
-    
+
     <main class="p-6">
-      <!-- Info Section -->
-      <section class="mb-8">
-        <SectionHeader title="INFO">
-          <template #icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-          </template>
-        </SectionHeader>
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+        <div class="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm text-gray-500">Detecting technologies...</p>
+      </div>
 
-        <div class="grid grid-cols-3 gap-4">
-          <InfoCard label="VUE VERSION" value="2.7.16" icon="vue" />
-          <InfoCard label="UI FRAMEWORK" value="Bootstrap Vue" icon="bootstrap" />
-          <InfoCard label="RENDERING" value="Client-side" />
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-12">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+          <ErrorIcon aria-hidden="true" />
         </div>
-      </section>
+        <p class="text-sm text-gray-600">{{ error }}</p>
+        <p class="text-xs text-gray-400 mt-1">Make sure you're on a webpage</p>
+      </div>
 
-      <!-- Plugins Section -->
-      <section>
-        <SectionHeader title="PLUGINS">
-          <template #icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 3v5"></path>
-              <path d="M15 3v5"></path>
-              <path d="M21 12H3"></path>
-              <path d="M3 21h18"></path>
-              <path d="M11 12v9"></path>
-            </svg>
-          </template>
-        </SectionHeader>
-
-        <div class="flex flex-wrap gap-3">
-          <PluginBadge name="vue-apollo" />
-          <PluginBadge name="vuex" />
+      <!-- Results Grid -->
+      <template v-else-if="results">
+        <div v-if="allDetected.length > 0" class="grid grid-cols-2 gap-4">
+          <InfoCard
+            v-for="tech in allDetected"
+            :key="tech.name"
+            :label="tech.category"
+            :value="formatVersion(tech.version) || tech.name"
+            :icon="tech.icon"
+          />
         </div>
-      </section>
+
+        <!-- No Detection State -->
+        <div v-else class="text-center py-12">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+            <SearchIcon />
+          </div>
+          <p class="text-sm text-gray-600">No technologies detected</p>
+          <p class="text-xs text-gray-400 mt-1">This page may not use detectable frameworks</p>
+        </div>
+      </template>
     </main>
   </div>
 </template>

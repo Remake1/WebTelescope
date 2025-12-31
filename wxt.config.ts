@@ -8,4 +8,12 @@ export default defineConfig({
   vite: () => ({
     plugins: [tailwindcss()],
   }),
+  manifest: {
+    web_accessible_resources: [
+      {
+        resources: ['injected.js'],
+        matches: ['<all_urls>'],
+      },
+    ],
+  },
 });

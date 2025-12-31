@@ -21,24 +21,25 @@ const iconSrc = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-gray-100 shadow-sm relative overflow-hidden transition-shadow hover:shadow-md">
-    <!-- Label Tab -->
-    <div class="absolute top-0 left-0 bg-gray-100 px-3 py-1.5 rounded-br-2xl">
-      <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+  <div class="bg-white rounded-xl border border-gray-100 shadow-sm relative overflow-hidden transition-shadow hover:shadow-md min-h-[80px]">
+    <!-- Label Tab (smaller) -->
+    <div class="absolute top-0 left-0 bg-gray-100 px-1.5 py-1 rounded-br-xl">
+      <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">
         {{ label }}
       </span>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex flex-col items-center justify-center px-4 pt-10 pb-4">
+    <!-- Main Content (absolutely centered) -->
+    <div class="absolute inset-0 flex items-center justify-center">
       <div class="flex items-center gap-2">
         <img v-if="iconSrc" :src="iconSrc" class="w-5 h-5" alt="" />
         <span :class="['font-bold text-gray-900', valueFontSize]">{{ value }}</span>
       </div>
+    </div>
 
-      <div v-if="subValue" class="text-xs text-gray-500 font-medium mt-1">
-        {{ subValue }}
-      </div>
+    <!-- SubValue (if any) -->
+    <div v-if="subValue" class="absolute bottom-2 left-0 right-0 text-center text-xs text-gray-500 font-medium">
+      {{ subValue }}
     </div>
   </div>
 </template>

@@ -115,7 +115,7 @@ export function detectAstro(): DetectionResult {
 export function detectVitePress(): DetectionResult {
     const result: DetectionResult = {
         name: 'VitePress',
-        icon: 'vitepress',
+        icon: 'vitejs',
         detected: false,
     };
 

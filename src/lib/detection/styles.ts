@@ -52,7 +52,7 @@ export function detectTailwind(): DetectionResult {
 export function detectMUI(): DetectionResult {
     const result: DetectionResult = {
         name: 'MUI',
-        icon: 'mui',
+        icon: 'material-ui',
         detected: false,
     };
 
