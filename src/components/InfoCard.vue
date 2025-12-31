@@ -5,12 +5,18 @@ const props = defineProps<{
   label: string;
   value: string;
   subValue?: string;
+  icon?: string;
 }>();
 
 const valueFontSize = computed(() => {
   if (props.value.length > 20) return 'text-xs';
   if (props.value.length > 12) return 'text-sm';
   return 'text-base';
+});
+
+const iconSrc = computed(() => {
+  if (!props.icon) return null;
+  return new URL(`../assets/${props.icon}.svg`, import.meta.url).href;
 });
 </script>
 
@@ -26,7 +32,7 @@ const valueFontSize = computed(() => {
     <!-- Main Content -->
     <div class="flex flex-col items-center justify-center px-4 pt-10 pb-4">
       <div class="flex items-center gap-2">
-        <slot name="icon"></slot>
+        <img v-if="iconSrc" :src="iconSrc" class="w-5 h-5" alt="" />
         <span :class="['font-bold text-gray-900', valueFontSize]">{{ value }}</span>
       </div>
 

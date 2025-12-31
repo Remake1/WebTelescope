@@ -23,22 +23,8 @@ import PluginBadge from '@/components/PluginBadge.vue';
         </SectionHeader>
 
         <div class="grid grid-cols-3 gap-4">
-          <InfoCard label="VUE VERSION" value="2.7.16">
-            <template #icon>
-              <svg viewBox="0 0 128 128" width="20" height="20">
-                <path fill="#41B883" d="M78.8,10L64,35.4L49.2,10H0l64,110l64-110C128,10,78.8,10,78.8,10z"/>
-                <path fill="#35495E" d="M78.8,10L64,35.4L49.2,10H25.6l38.4,66l38.4-66H78.8z"/>
-              </svg>
-            </template>
-          </InfoCard>
-
-          <InfoCard label="UI FRAMEWORK" value="Bootstrap Vue">
-            <template #icon>
-              <!-- Bootstrap Icon Proxy -->
-              <div class="w-5 h-5 bg-[#563d7c] rounded text-white flex items-center justify-center text-[10px] font-bold">B</div>
-            </template>
-          </InfoCard>
-
+          <InfoCard label="VUE VERSION" value="2.7.16" icon="vue" />
+          <InfoCard label="UI FRAMEWORK" value="Bootstrap Vue" icon="bootstrap" />
           <InfoCard label="RENDERING" value="Client-side" />
         </div>
       </section>
