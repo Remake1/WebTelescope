@@ -9,6 +9,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
+    name: 'WebTelescope',
+    description: 'Detect web technologies on any website',
     web_accessible_resources: [
       {
         resources: ['injected.js'],
@@ -16,4 +18,9 @@ export default defineConfig({
       },
     ],
   },
+  webExt: {
+    binaries: {
+      firefox: 'firefoxdeveloperedition',
+    }
+  }
 });

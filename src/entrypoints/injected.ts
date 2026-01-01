@@ -31,12 +31,12 @@ export default defineUnlistedScript(() => {
     if (document.readyState === 'complete') {
         // Page already loaded, run detection after a small delay
         // to ensure frameworks have initialized
-        setTimeout(sendResults, 100);
+        setTimeout(sendResults, 500);
     } else {
         // Wait for load event
         window.addEventListener('load', () => {
             // Add small delay to let frameworks fully initialize
-            setTimeout(sendResults, 100);
+            setTimeout(sendResults, 500);
         });
     }
 });

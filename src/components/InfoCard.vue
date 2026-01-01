@@ -16,7 +16,7 @@ const valueFontSize = computed(() => {
 
 const iconSrc = computed(() => {
   if (!props.icon) return null;
-  return new URL(`../assets/${props.icon}.svg`, import.meta.url).href;
+  return `/${props.icon}.svg`;
 });
 </script>
 

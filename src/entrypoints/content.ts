@@ -34,6 +34,12 @@ export default defineContentScript({
     // Wait for initial detection
     cachedResults = await resultsPromise;
     console.log('[WebTelescope] Detection complete:', cachedResults);
+
+    // Notify background script to update badge
+    browser.runtime.sendMessage({
+      type: 'DETECTION_COMPLETE',
+      results: cachedResults,
+    });
   },
 });
 
