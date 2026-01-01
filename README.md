@@ -1,7 +1,15 @@
-# WXT + Vue 3
+# WebTelescope - WXT + Vue 3
 
-This template should help get you started developing with Vue 3 in WXT.
+Browser extension that detects website technology stack.
 
-## Recommended IDE Setup
+### Detections:
+- Core framework: React, Vue, Angular, Svelte, jQuery
+- Meta framework: Next.js, Nuxt, Astro, VitePress, Gatsby
+- UI library: TailwindCSS, MUI, Bootstrap
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+### Screenshots:
+![React](./images/screenshot_react.png)
+![Vue](./images/screenshot_vue.png)
+![Angular](./images/screenshot_angular.png)
+
+Inspired by https://github.com/nuxtlabs/vue-telescope-extensions
